@@ -1,8 +1,12 @@
 package com.vnetpublishing.java.suapp;
 
 import java.io.UnsupportedEncodingException;
+import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Kernel32;
@@ -67,23 +71,49 @@ public class WinSudo implements ISudo
 		try {
 			String jarPath = WinSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         	String decodedPath = URLDecoder.decode(jarPath, "UTF-8");
+        	
         	decodedPath = decodedPath.substring(1, decodedPath.length());
         
         	ArrayList<String> pargs = new ArrayList(args.length + 2);
         
-        	if (decodedPath.endsWith(".jar")) {
-        		pargs.add("-jar");
-            	pargs.add(decodedPath);
-        	} else {
-        		throw new IllegalStateException("Unable to perform elevation outside jar");
-        	}
+        	String jcmd = System.getProperty("sun.java.command");
         	
-        	if (args != null) {
-        		for(int idx=0;idx<args.length;idx++) {
-        			pargs.add(args[idx]);
+        	if (jcmd == null || jcmd.length() < 1) {
+        		if (decodedPath.endsWith(".jar")) {
+        			pargs.add("-jar");
+        			pargs.add(decodedPath);
+        			
+        			if (args != null) {
+        				for(int idx=0;idx<args.length;idx++) {
+        					pargs.add(args[idx]);
+        				}
+        			}
+        		} else {
+        			throw new IllegalStateException("Unable to perform elevation outside of jar");
+        		}
+        	} else {
+        		List<String> inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
+        		
+        		Iterator<String> iap = inputArguments.iterator();
+        		while(iap.hasNext()) {
+        			pargs.add(iap.next());
+        		}
+        		
+
+        		
+        		String[] cmd = jcmd.split("\\s+");
+        		
+        		if (cmd.length > 0 && cmd[0].endsWith(".jar")) {
+        			pargs.add("-jar");
+        		}
+        		
+        		for(int idx=0;idx<cmd.length;idx++) {
+        			pargs.add(cmd[idx]);
         		}
         	}
-        	String strparams = toParams(pargs.toArray(new String[args.length + 2]));
+        	
+        	String strparams = toParams(pargs.toArray(new String[pargs.size()]));
+        	
         	return executeAsAdministrator(System.getProperty("java.home") + "\\bin\\java", strparams);
         } catch (UnsupportedEncodingException ex) {
         	throw new RuntimeException(ex);
