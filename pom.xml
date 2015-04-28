@@ -1,0 +1,51 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>com.vnetpublishing.java</groupId>
+  <artifactId>super-user-application</artifactId>
+  <version>0.0.1-SNAPSHOT</version>
+  <name>Super User Application</name>
+  <description>Create self elevating applications</description>
+  <dependencies>
+  	<dependency>
+		<groupId>net.java.dev.jna</groupId>
+		<artifactId>jna-platform</artifactId>
+		<version>4.1.0</version>
+  	</dependency>
+  	<dependency>
+		<groupId>junit</groupId>
+		<artifactId>junit</artifactId>
+		<version>4.12</version>
+		<scope>test</scope>
+	</dependency>
+  </dependencies>
+  	<build>
+		<directory>target</directory>
+		<outputDirectory>target/classes</outputDirectory>
+		<finalName>${project.artifactId}-${project.version}</finalName>
+		<testOutputDirectory>target/test-classes</testOutputDirectory>
+		<sourceDirectory>src/main/java</sourceDirectory>
+		<scriptSourceDirectory>src/main/scripts</scriptSourceDirectory>
+		<testSourceDirectory>src/test/java</testSourceDirectory>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+			</resource>
+		</resources>
+		<testResources>
+			<testResource>
+				<directory>src/test/resources</directory>
+			</testResource>
+		</testResources>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.3</version>
+				<configuration>
+					<source>1.7</source>
+					<target>1.7</target>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
+</project>
