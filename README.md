@@ -1,6 +1,24 @@
 # super-user-application
 Execute Jar's with Administrator privileges
 
+## Installation
+
+Checkout this repository and execute the maven installer from the base directory with the pom.xml file in it.
+
+```
+mvn install
+```
+
+Once it is installed you can add it to your projects as a maven dependency.
+
+### Maven Dependency
+```
+<dependency>
+	<groupId>com.vnetpublishing.java</groupId>
+	<artifactId>super-user-application</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+</dependency>
+```
 ### Example Usage:
 
 ```
