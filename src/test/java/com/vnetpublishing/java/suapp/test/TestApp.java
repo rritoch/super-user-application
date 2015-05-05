@@ -15,20 +15,17 @@ import static org.junit.Assert.*;
 public class TestApp extends SuperUserApplication {
 
 	
-	/*
 	@Test
 	public void sudoTest() {
+		System.out.println("sudoTest called!");
 		SU.setDaemon(true);
 		int result = SU.run(this, new String[]{});
 		assertEquals(0, result);
 	}
 
-	*/
-	
 	public int run(String[] args) 
 	{
-		// Never made it here...
-		throw new RuntimeException("NOT IT!");
-		//return 0;
+		System.out.println("*** Admin Process RUN in TEST ***");
+		return 0;
 	}
 }

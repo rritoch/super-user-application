@@ -2,8 +2,11 @@ package com.vnetpublishing.java.suapp;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class MacSudo implements ISudo {
 
@@ -27,7 +30,10 @@ public class MacSudo implements ISudo {
     		builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
     		
     		Process p1 = builder.start();
-			return p1.waitFor();
+    		
+    		p1.waitFor();
+    		
+			return p1.exitValue();
 		} catch (IOException ex) {
 			throw new IllegalStateException(ex);
 		} catch (InterruptedException ex) {
@@ -39,23 +45,48 @@ public class MacSudo implements ISudo {
 		try {
 			String jarPath = MacSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         	String decodedPath = URLDecoder.decode(jarPath, "UTF-8");
-        	
+        
         	ArrayList<String> pargs = new ArrayList(args.length + 2);
         
-        	if (decodedPath.endsWith(".jar")) {
-        		pargs.add("-jar");
-            	pargs.add(decodedPath);
-        	} else {
-        		throw new IllegalStateException("Unable to perform elevation outside jar");
-        	}
-        
-        	if (args != null) {
-        		for(int idx=0;idx<args.length;idx++) {
-        			pargs.add(args[idx]);
-        		}
-        	}
+        	String jcmd = System.getProperty("sun.java.command");
         	
-        	String[] sargs = pargs.toArray(new String[args.length + 2]);
+        	
+			if (jcmd == null || jcmd.length() < 1) {
+				if (decodedPath.endsWith(".jar")) {
+					pargs.add("-jar");
+					pargs.add(decodedPath);
+					
+					if (args != null) {
+						for(int idx=0;idx<args.length;idx++) {
+							pargs.add(args[idx]);
+						}
+					}
+				} else {
+					throw new IllegalStateException("Unable to perform elevation outside of jar");
+				}
+			} else {
+				List<String> inputArguments = ManagementFactory.getRuntimeMXBean().getInputArguments();
+				
+				Iterator<String> iap = inputArguments.iterator();
+				while(iap.hasNext()) {
+					pargs.add(iap.next());
+				}
+				
+				String[] cmd = jcmd.split("\\s+");
+				
+				if (cmd.length > 0 && cmd[0].endsWith(".jar")) {
+					pargs.add("-jar");
+				}
+				
+				for(int idx=0;idx<cmd.length;idx++) {
+					pargs.add(cmd[idx]);
+				}
+			}
+			
+			//System.out.println(pargs);
+        	
+        	String[] sargs = pargs.toArray(new String[pargs.size()]);
+        	
         	return executeAsAdministrator(System.getProperty("java.home") + "/bin/java", sargs);
         } catch (UnsupportedEncodingException ex) {
         	throw new RuntimeException(ex);
@@ -67,6 +98,5 @@ public class MacSudo implements ISudo {
 	{
 		return sudo(new String[]{});
 	}
-
 
 }
