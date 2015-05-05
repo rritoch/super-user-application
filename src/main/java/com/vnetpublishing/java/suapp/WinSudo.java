@@ -56,7 +56,7 @@ public class WinSudo implements ISudo
 		//PROCESS_INFORMATION pi = new PROCESS_INFORMATION();
 		//STARTUPINFO si = new STARTUPINFO(); 
 		
-		HANDLE hJob = Kernel32X.INSTANCE.CreateJobObject(null,null);
+		final HANDLE hJob = Kernel32X.INSTANCE.CreateJobObject(null,null);
 		
 		IntByReference lpReturnLength = new IntByReference(); 
 		
@@ -113,13 +113,28 @@ public class WinSudo implements ISudo
 			System.out.println("NOTICE: Assigned process to job.");
 		}
 		
+		final HANDLE childProcess = execInfo.hProcess;
+		
+		Thread shutdownHook = new Thread() {
+			@Override
+			public void run() {
+				System.out.println("Terminating child process");
+				Kernel32.INSTANCE.TerminateProcess(childProcess, 0);
+				Kernel32X.INSTANCE.CloseHandle(childProcess);
+				Kernel32X.INSTANCE.CloseHandle(hJob);
+			}
+		};
+		
+		Runtime.getRuntime().addShutdownHook(shutdownHook);
+		
 		IntByReference code = new IntByReference();
 		Kernel32.INSTANCE.WaitForSingleObject(execInfo.hProcess, Kernel32.INFINITE);
 		
+		Runtime.getRuntime().removeShutdownHook(shutdownHook);
+		
 		Kernel32.INSTANCE.GetExitCodeProcess(execInfo.hProcess, code);
 		lastError = code.getValue();
-		
-		Kernel32X.INSTANCE.CloseHandle(execInfo.hProcess);
+		Kernel32X.INSTANCE.CloseHandle(childProcess);
 		Kernel32X.INSTANCE.CloseHandle(hJob);
 		
 		return lastError;
