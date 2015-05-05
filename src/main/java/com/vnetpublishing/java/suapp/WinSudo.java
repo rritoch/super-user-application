@@ -10,6 +10,7 @@ import java.util.List;
 
 import com.sun.jna.IntegerType;
 import com.sun.jna.Native;
+import com.sun.jna.Pointer;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
@@ -17,6 +18,7 @@ import com.sun.jna.platform.win32.WinBase.PROCESS_INFORMATION;
 import com.sun.jna.platform.win32.WinBase.STARTUPINFO;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 
 
 public class WinSudo implements ISudo 
@@ -63,13 +65,46 @@ public class WinSudo implements ISudo
         PROCESS_INFORMATION pi = new PROCESS_INFORMATION();
         STARTUPINFO si = new STARTUPINFO(); 
         
-        Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = new Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
+        
         
         HANDLE hJob = Kernel32X.INSTANCE.CreateJobObject(null,null);
+
+        //PointerByReference lpJobObjectInfo = new PointerByReference();
+        
+        IntByReference lpReturnLength = new IntByReference(); 
+        
+        int cbJobObjectInfoLength = 0;
+        
+        Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = new Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
+        
+        if (!Kernel32X.INSTANCE.QueryInformationJobObject(
+      		  hJob,
+      		  9,
+      		  jeli,
+      		  jeli.size(),
+      		  lpReturnLength
+      	)) {
+        	lastError = Kernel32X.INSTANCE.GetLastError();
+        	errorMessage = Kernel32Util.formatMessageFromLastErrorCode(lastError);
+        	System.out.println("WARNING: Error querying job object: " + lastError + ": " + errorMessage);
+        } else {
+        	System.out.println("NOTICE: Job object query successful.");
+        }
+
+        //HANDLE myHandle = Kernel32.INSTANCE.GetCurrentProcess();
+        //System.out.println("MyHandle="+myHandle.toString());
+        
         
         jeli.BasicLimitInformation.limitFlags = Kernel32X.JOB_OBJECT_EXTENDED_LIMIT_KILL_ON_JOB_CLOSE;
         
-        Kernel32X.INSTANCE.SetInformationJobObject(hJob, 2, jeli.getPointer(), jeli.size());
+        if (!Kernel32X.INSTANCE.SetInformationJobObject(hJob, 9, jeli.getPointer(), jeli.size())) {
+
+        	lastError = Kernel32X.INSTANCE.GetLastError();
+        	errorMessage = Kernel32Util.formatMessageFromLastErrorCode(lastError);
+        	System.out.println("WARNING: Error in SetInformationJobObject: " + lastError + ": " + errorMessage);
+        } else {
+        	System.out.println("NOTICE: SetInformationJobObject successful.");
+        }
         
         execInfo.nShow = Shell32X.SW_HIDE;
         
@@ -93,6 +128,7 @@ public class WinSudo implements ISudo
         	System.out.println("NOTICE: Assigned process to job.");
         }
         
+        
         IntByReference code = new IntByReference();
         Kernel32.INSTANCE.WaitForSingleObject(execInfo.hProcess, Kernel32.INFINITE);
         
@@ -102,7 +138,7 @@ public class WinSudo implements ISudo
         lastError = code.getValue();
         
         Kernel32X.INSTANCE.CloseHandle(execInfo.hProcess);
-        Kernel32X.INSTANCE.CloseHandle(hJob);
+        //Kernel32X.INSTANCE.CloseHandle(hJob);
         
         return lastError;
     }

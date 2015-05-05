@@ -4,6 +4,7 @@ import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.platform.win32.WinBase;
 import com.sun.jna.ptr.IntByReference;
+import com.sun.jna.ptr.PointerByReference;
 import com.sun.jna.win32.W32APIOptions;
 
 import java.util.Arrays;
@@ -36,6 +37,14 @@ public interface Kernel32X extends com.sun.jna.platform.win32.Kernel32 {
     public HANDLE GetStdHandle(DWORD nStdHandle);
 
 
+    
+    boolean QueryInformationJobObject(
+    		  HANDLE hJob,
+    		  int JobObjectInfoClass,
+    		  JOBOBJECT_EXTENDED_LIMIT_INFORMATION lpJobObjectInfo,
+    		  int cbJobObjectInfoLength,
+    		  IntByReference lpReturnLength
+    );
 
     //Basic limit flags
     int JOB_OBJECT_BASIC_LIMIT_ACTIVE_PROCESS = 8;
@@ -101,6 +110,19 @@ public interface Kernel32X extends com.sun.jna.platform.win32.Kernel32 {
 
     public static class JOBOBJECT_EXTENDED_LIMIT_INFORMATION extends Structure 
     {
+    	
+    	class ByReference extends  JOBOBJECT_EXTENDED_LIMIT_INFORMATION implements Structure.ByReference { }
+    	
+    	
+    	public JOBOBJECT_EXTENDED_LIMIT_INFORMATION() {
+    		super();
+    	}
+    	
+    	public JOBOBJECT_EXTENDED_LIMIT_INFORMATION(Pointer p) {
+    		super(p);
+    	}
+    	
+    	
     
     	/* typedef struct _JOBOBJECT_EXTENDED_LIMIT_INFORMATION {
     	  JOBOBJECT_BASIC_LIMIT_INFORMATION BasicLimitInformation;
