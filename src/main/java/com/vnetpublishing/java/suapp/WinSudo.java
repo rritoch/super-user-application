@@ -65,7 +65,7 @@ public class WinSudo implements ISudo
 		if (!Kernel32X.INSTANCE.QueryInformationJobObject(
 	  		  hJob,
 	  		  9,
-	  		  jeli,
+	  		  jeli.getPointer(),
 	  		  jeli.size(),
 	  		  lpReturnLength
 	  	)) {

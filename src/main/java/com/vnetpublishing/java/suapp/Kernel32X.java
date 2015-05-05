@@ -36,15 +36,7 @@ public interface Kernel32X extends com.sun.jna.platform.win32.Kernel32 {
 
     public HANDLE GetStdHandle(DWORD nStdHandle);
 
-
-    
-    boolean QueryInformationJobObject(
-    		  HANDLE hJob,
-    		  int JobObjectInfoClass,
-    		  JOBOBJECT_EXTENDED_LIMIT_INFORMATION lpJobObjectInfo,
-    		  int cbJobObjectInfoLength,
-    		  IntByReference lpReturnLength
-    );
+    boolean QueryInformationJobObject(HANDLE hJob,int JobObjectInfoClass,Pointer lpJobObjectInfo,int cbJobObjectInfoLength,IntByReference lpReturnLength);
 
     //Basic limit flags
     int JOB_OBJECT_BASIC_LIMIT_ACTIVE_PROCESS = 8;
