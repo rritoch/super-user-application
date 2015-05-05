@@ -27,7 +27,7 @@ public class LinuxSudo implements ISudo {
     	try {
     		ProcessBuilder builder = new ProcessBuilder(pargs);
     		
-    		builder.redirectOutput(ProcessBuilder.Redirect.INHERIT);
+    		builder.inheritIO();
     		
     		Process p1 = builder.start();
     		
