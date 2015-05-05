@@ -3,14 +3,20 @@ package com.vnetpublishing.java.suapp;
 import java.util.Arrays;
 import java.util.List;
 
+import com.sun.jna.IntegerType;
 import com.sun.jna.Native;
 import com.sun.jna.Pointer;
 import com.sun.jna.Structure;
 import com.sun.jna.WString;
+import com.sun.jna.platform.win32.BaseTSD.ULONG_PTR;
 import com.sun.jna.platform.win32.Shell32;
+import com.sun.jna.platform.win32.WinBase.SECURITY_ATTRIBUTES;
 import com.sun.jna.platform.win32.WinDef.HINSTANCE;
 import com.sun.jna.platform.win32.WinDef.HWND;
+import com.sun.jna.platform.win32.WinDef.ULONGLONG;
+import com.sun.jna.platform.win32.WinDef.WORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 import com.sun.jna.platform.win32.WinReg.HKEY;
 import com.sun.jna.win32.W32APIOptions;
 
@@ -57,8 +63,135 @@ public interface Shell32X extends Shell32
     int ShellExecute(int i, String lpVerb, String lpFile, String lpParameters, String lpDirectory, int nShow);
     boolean ShellExecuteEx(SHELLEXECUTEINFO lpExecInfo);
 
+     
 
+    public static class size_t extends IntegerType {
+        public size_t() { this(0); }
+        public size_t(long value) { super(Native.SIZE_T_SIZE, value); }
+    }
+    
 
+    
+
+    /*
+    public static class STARTUPINFO extends Structure {
+    	/*
+typedef struct _STARTUPINFO {
+  DWORD  cb;
+  LPTSTR lpReserved;
+  LPTSTR lpDesktop;
+  LPTSTR lpTitle;
+  DWORD  dwX;
+  DWORD  dwY;
+  DWORD  dwXSize;
+  DWORD  dwYSize;
+  DWORD  dwXCountChars;
+  DWORD  dwYCountChars;
+  DWORD  dwFillAttribute;
+  DWORD  dwFlags;
+  WORD   wShowWindow;
+  WORD   cbReserved2;
+  LPBYTE lpReserved2;
+  HANDLE hStdInput;
+  HANDLE hStdOutput;
+  HANDLE hStdError;
+} STARTUPINFO, *LPSTARTUPINFO;
+    	
+    	
+    	  int  cb;
+    	  char[] lpReserved;
+    	  char[] lpDesktop;
+    	  char[] lpTitle;
+    	  int  dwX;
+    	  int  dwY;
+    	  int  dwXSize;
+    	  int  dwYSize;
+    	  int  dwXCountChars;
+    	  int  dwYCountChars;
+    	  int  dwFillAttribute;
+    	  int  dwFlags;
+    	  WORD   wShowWindow;
+    	  WORD   cbReserved2;
+    	  Pointer lpReserved2;
+    	  HANDLE hStdInput;
+    	  HANDLE hStdOutput;
+    	  HANDLE hStdError;
+    	  
+        protected List getFieldOrder() {
+            return Arrays.asList(new String[] {
+              	  "cb",
+            	  "lpReserved",
+            	  "lpDesktop",
+            	  "lpTitle",
+            	  "dwX",
+            	  "dwY",
+            	  "dwXSize",
+            	  "dwYSize",
+            	  "dwXCountChars",
+            	  "dwYCountChars",
+            	  "dwFillAttribute",
+            	  "dwFlags",
+            	  "wShowWindow",
+            	  "cbReserved2",
+            	  "lpReserved2",
+            	  "hStdInput",
+            	  "hStdOutput",
+            	  "hStdError"
+            });
+        }
+    }
+    
+    public static class PROCESS_INFORMATION extends Structure {
+    	/*
+    	 typedef struct _PROCESS_INFORMATION {
+  HANDLE hProcess;
+  HANDLE hThread;
+  DWORD  dwProcessId;
+  DWORD  dwThreadId;
+} PROCESS_INFORMATION, *LPPROCESS_INFORMATION;
+    	 
+    	
+    	HANDLE hProcess;
+    	HANDLE hThread;
+    	int  dwProcessId;
+    	int  dwThreadId;
+    	  
+        protected List getFieldOrder() {
+            return Arrays.asList(new String[] {
+          	  	  "hProcess",
+          	  	  "hThread",
+          	  	  "dwProcessId",
+          	  	  "dwThreadId"
+            });
+        }
+    }
+    
+    */
+
+    
+    /*
+    public static class SECURITY_ATTRIBUTES extends Structure
+    {
+		/*
+			typedef struct _SECURITY_ATTRIBUTES {
+			DWORD  nLength;
+			LPVOID lpSecurityDescriptor;
+			BOOL   bInheritHandle;
+			} SECURITY_ATTRIBUTES, *PSECURITY_ATTRIBUTES, *LPSECURITY_ATTRIBUTES;
+		
+    	public int nLength = size();
+    	public Pointer lpSecurityDescriptor;
+    	public int bInheritHandle;
+    	
+        protected List getFieldOrder() {
+            return Arrays.asList(new String[] {
+                "nLength","lpSecurityDescriptor","bInheritHandle"
+            });
+        }
+    }
+    
+    */
+    
     public static class SHELLEXECUTEINFO extends Structure
     {
         /*

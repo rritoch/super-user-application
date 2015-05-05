@@ -15,6 +15,7 @@ import static org.junit.Assert.*;
 public class TestApp extends SuperUserApplication {
 
 	
+	/*
 	@Test
 	public void sudoTest() {
 		SU.setDaemon(true);
@@ -22,7 +23,7 @@ public class TestApp extends SuperUserApplication {
 		assertEquals(0, result);
 	}
 
-	
+	*/
 	
 	public int run(String[] args) 
 	{

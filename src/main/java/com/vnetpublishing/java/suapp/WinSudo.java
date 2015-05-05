@@ -8,9 +8,14 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
+import com.sun.jna.IntegerType;
+import com.sun.jna.Native;
 import com.sun.jna.WString;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
+import com.sun.jna.platform.win32.WinBase.PROCESS_INFORMATION;
+import com.sun.jna.platform.win32.WinBase.STARTUPINFO;
+import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
 
 
@@ -51,6 +56,20 @@ public class WinSudo implements ISudo
         if (args != null)
             execInfo.lpParameters = new WString(args);
         //execInfo.nShow = Shell32X.SW_SHOWDEFAULT;
+        
+        // Setup Job
+        
+        PROCESS_INFORMATION pi = new PROCESS_INFORMATION();
+        STARTUPINFO si = new STARTUPINFO(); 
+        
+        Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION jeli = new Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION();
+        
+        HANDLE hJob = Kernel32X.INSTANCE.CreateJobObject(null,null);
+        
+        jeli.BasicLimitInformation.limitFlags = Kernel32X.JOB_OBJECT_EXTENDED_LIMIT_KILL_ON_JOB_CLOSE;
+        
+        Kernel32X.INSTANCE.SetInformationJobObject(hJob, 2, jeli.getPointer(), jeli.size());
+        
         execInfo.nShow = Shell32X.SW_HIDE;
         
         execInfo.fMask = Shell32X.SEE_MASK_NOCLOSEPROCESS;
@@ -64,13 +83,24 @@ public class WinSudo implements ISudo
             throw new RuntimeException("Error performing elevation: " + lastError + ": " + errorMessage + " (apperror=" + execInfo.hInstApp + ")");
         }
         
+        
+        Kernel32X.INSTANCE.AssignProcessToJobObject(hJob, execInfo.hProcess);
+        
         IntByReference code = new IntByReference();
         Kernel32.INSTANCE.WaitForSingleObject(execInfo.hProcess, Kernel32.INFINITE);
+        
+        
+        
         Kernel32.INSTANCE.GetExitCodeProcess(execInfo.hProcess, code);
         lastError = code.getValue();
+        
+        Kernel32X.INSTANCE.CloseHandle(execInfo.hProcess);
+        Kernel32X.INSTANCE.CloseHandle(hJob);
+        
         return lastError;
     }
 	
+
 	
 	public int sudo(String[] args) {
 		try {
