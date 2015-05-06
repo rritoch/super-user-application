@@ -1,15 +1,74 @@
 package com.vnetpublishing.java.suapp;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
 public class LinuxSudo implements ISudo {
 
+	public static String argsToString(List args) {
+		StringBuilder sb = new StringBuilder();
+		Iterator<String> i = args.iterator();
+		while(i.hasNext()) {
+			sb.append(i.next());
+			if (i.hasNext()) {
+				sb.append(" ");
+			}
+		}
+		return sb.toString();
+	}
+	public static void applySudoArgs(List args) 
+	{
+		File s;
+		List holdargs = new ArrayList();
+		holdargs.addAll(args);
+		args.clear();
+		
+		
+		// Try gksudo
+		s = new File("/usr/bin/gksudo");
+		if (s.canExecute()) {
+			args.add("/usr/bin/gksudo");
+			
+			args.add("--description");
+			args.add("Java Application");
+			
+			args.add(argsToString(holdargs));
+			return;
+		}
+		
+		// Try kdesudo
+		s = new File("/usr/bin/kdesudo");
+		if (s.canExecute()) {
+			args.add("/usr/bin/kdesudo");
+			args.add("-d");
+			args.add("-c");
+			
+			//args.add("-c");
+			args.add(argsToString(holdargs));
+			
+			args.add("--comment");
+			args.add("Java application needs administrative privileges. Please enter your password");
+			return;
+		}
+		
+		// Try sudo
+		s = new File("/usr/bin/sudo");
+		if (s.canExecute()) {
+			args.add("/usr/bin/sudo");
+			args.addAll(holdargs);
+			return;
+		}
+		
+		throw new IllegalStateException("SUDO application not found!");
+	}
+	
     public static int executeAsAdministrator(String command, String[] args)
     {
     	
@@ -17,13 +76,15 @@ public class LinuxSudo implements ISudo {
     	
     	ArrayList<String> pargs = new ArrayList(len+2);
     	
-    	pargs.add("/usr/bin/sudo");
     	pargs.add(command);
     	
     	for(int idx=0;idx<len;idx++) {
     		pargs.add(args[idx]);
     	}
     	
+    	applySudoArgs(pargs);
+    	
+    	System.out.println(pargs);
     	try {
     		ProcessBuilder builder = new ProcessBuilder(pargs);
     		
