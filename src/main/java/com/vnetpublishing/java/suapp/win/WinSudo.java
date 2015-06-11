@@ -1,4 +1,4 @@
-package com.vnetpublishing.java.suapp;
+package com.vnetpublishing.java.suapp.win;
 
 import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
@@ -12,6 +12,9 @@ import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.ptr.IntByReference;
+import com.vnetpublishing.java.suapp.ISudo;
+import com.vnetpublishing.java.suapp.win.Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION;
+import com.vnetpublishing.java.suapp.win.Shell32X.SHELLEXECUTEINFO;
 
 public class WinSudo implements ISudo 
 {

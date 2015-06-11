@@ -1,7 +1,20 @@
 package com.vnetpublishing.java.suapp;
 
+import java.util.logging.Logger;
+
+import com.vnetpublishing.java.suapp.linux.LinuxSudo;
+import com.vnetpublishing.java.suapp.mac.MacSudo;
+import com.vnetpublishing.java.suapp.mac.MacSuperUserDetector;
+import com.vnetpublishing.java.suapp.posix.PosixSudo;
+import com.vnetpublishing.java.suapp.posix.PosixSuperUserDetector;
+import com.vnetpublishing.java.suapp.win.WinSudo;
+import com.vnetpublishing.java.suapp.win.WinSuperUserDetector;
+
 public abstract class SuperUserApplication 
- implements ISuperUserApplication {
+ implements ISuperUserApplication 
+{
+	private final static Logger logger = Logger.getLogger(SuperUserApplication.class.getName());
+	
 	public final int sudo(String[] args) 
 	{
 		String os = SU.getOS();
@@ -14,10 +27,9 @@ public abstract class SuperUserApplication
 			sudo = new LinuxSudo();
 		} else if ("mac".equals(os)) {
 			sudo = new MacSudo();
-		}
-		
-		if (null == sudo) {
-			throw new IllegalStateException(String.format("Unsupported operating system: %s",os));
+		} else {
+			logger.warning(String.format("Unsupported platform '%s, falling back to posix'",os));
+			sudo = new PosixSudo();
 		}
 		
 		return sudo.sudo(args);
@@ -38,7 +50,7 @@ public abstract class SuperUserApplication
 		if ("windows".equals(os)) {
 			detector = new WinSuperUserDetector();
 		} else if ("linux".equals(os)) {
-			detector = new LinuxSuperUserDetector();
+			detector = new PosixSuperUserDetector();
 		} else if ("mac".equals(os)) {
 			detector = new MacSuperUserDetector();
 		}

@@ -5,6 +5,7 @@
   <version>0.0.1-SNAPSHOT</version>
   <name>Super User Application</name>
   <description>Create self elevating applications</description>
+  
   <dependencies>
   	<dependency>
 		<groupId>net.java.dev.jna</groupId>

@@ -1,10 +1,12 @@
-package com.vnetpublishing.java.suapp;
+package com.vnetpublishing.java.suapp.posix;
 
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-public class LinuxSuperUserDetector
+import com.vnetpublishing.java.suapp.ISuperUserDetector;
+
+public class PosixSuperUserDetector
 	implements ISuperUserDetector {
 
 	private static final String ID_CMD = "/usr/bin/id";

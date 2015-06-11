@@ -1,4 +1,4 @@
-package com.vnetpublishing.java.suapp;
+package com.vnetpublishing.java.suapp.mac;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -8,21 +8,53 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
+import com.vnetpublishing.java.suapp.ISudo;
+
 public class MacSudo implements ISudo {
 
+	public static String escapeParam(String param) 
+	{
+		String parts[] = param.split("\\s+");
+		if (parts.length < 2) {
+			return param;
+		}
+		
+		return String.format(
+			"\"%s\"",
+			param.replaceAll("\\", "\\\\\\\\").replaceAll("\"", "\\\\\\\"")
+		);
+	}
+	
+	private static String toParams(String[] params) 
+	{
+		StringBuilder sb = new StringBuilder();
+		if (params.length > 0) {
+			sb.append(params[0]);
+		}
+		for(int idx=1;idx<params.length;idx++) {
+			sb.append(" ");
+			sb.append(params[idx]);
+		}
+		return sb.toString();
+	}
+	
     public static int executeAsAdministrator(String command, String[] args)
     {
     	
     	int len = args == null ? 0 : args.length;
     	
-    	ArrayList<String> pargs = new ArrayList(len+2);
+    	List<String> cargs = new ArrayList<String>(args.length+1);
     	
-    	pargs.add("/usr/bin/sudo");
-    	pargs.add(command);
-    	
+    	cargs.add(command);
     	for(int idx=0;idx<len;idx++) {
-    		pargs.add(args[idx]);
+    		cargs.add(args[idx]);
     	}
+    	
+    	ArrayList<String> pargs = new ArrayList<String>(3);
+    	
+    	pargs.add("/usr/bin/osascript");
+    	pargs.add("-e");
+    	pargs.add(String.format("do shell script \"%s\" with administrator privileges",toParams(cargs.toArray(new String[cargs.size()]))));
     	
     	try {
     		ProcessBuilder builder = new ProcessBuilder(pargs);
@@ -46,7 +78,7 @@ public class MacSudo implements ISudo {
 			String jarPath = MacSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         	String decodedPath = URLDecoder.decode(jarPath, "UTF-8");
         
-        	ArrayList<String> pargs = new ArrayList(args.length + 2);
+        	ArrayList<String> pargs = new ArrayList<String>(args.length + 2);
         
         	String jcmd = System.getProperty("sun.java.command");
         	

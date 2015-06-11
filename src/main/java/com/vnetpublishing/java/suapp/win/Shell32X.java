@@ -1,4 +1,4 @@
-package com.vnetpublishing.java.suapp;
+package com.vnetpublishing.java.suapp.win;
 
 import java.util.Arrays;
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.vnetpublishing.java.suapp;
+package com.vnetpublishing.java.suapp.posix;
 
 import java.io.File;
 import java.io.IOException;
@@ -6,11 +6,12 @@ import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 
-public class LinuxSudo implements ISudo {
+import com.vnetpublishing.java.suapp.ISudo;
+
+public class PosixSudo implements ISudo {
 
 	public static String argsToString(List args) {
 		StringBuilder sb = new StringBuilder();
@@ -104,7 +105,7 @@ public class LinuxSudo implements ISudo {
     
 	public int sudo(String[] args) {
 		try {
-			String jarPath = LinuxSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
+			String jarPath = PosixSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         	String decodedPath = URLDecoder.decode(jarPath, "UTF-8");
         
         	ArrayList<String> pargs = new ArrayList(args.length + 2);
