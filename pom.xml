@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.vnetpublishing.java</groupId>
   <artifactId>super-user-application</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>Super User Application</name>
   <description>Create self elevating applications</description>
   
