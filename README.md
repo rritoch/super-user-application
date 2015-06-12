@@ -5,11 +5,13 @@ Execute Jar's with Administrator privileges
 
 Add the following dependency to your pom.xml
 
+```
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
 	<version>0.0.3</version>
 </dependency>
+```
 
 ## Building
 
