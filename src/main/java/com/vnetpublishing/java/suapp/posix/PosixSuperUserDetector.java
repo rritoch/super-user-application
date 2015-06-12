@@ -7,7 +7,8 @@ import java.io.InputStreamReader;
 import com.vnetpublishing.java.suapp.ISuperUserDetector;
 
 public class PosixSuperUserDetector
-	implements ISuperUserDetector {
+	implements ISuperUserDetector 
+{
 
 	private static final String ID_CMD = "/usr/bin/id";
 	

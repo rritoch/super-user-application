@@ -13,7 +13,141 @@ import com.vnetpublishing.java.suapp.ISudo;
 
 public class PosixSudo implements ISudo {
 
-	public static String argsToString(List args) {
+	public static List<String> stringToArgs(String in) 
+	{
+		int ptr = 0;
+		int len = in.length();
+
+		Character quote = null;
+		boolean escape = false;
+		List<String> ret = new ArrayList<String>();
+		StringBuilder sb = new StringBuilder();
+		boolean skipspaces = true;
+		boolean dirty = false;
+		while(ptr < len) {
+			char c = in.charAt(ptr);
+			if (quote == null) {
+				switch (c) {
+					case ' ':
+					case '\r':
+					case '\n':
+					case '\t':
+						if (!skipspaces) {
+							if (dirty) {
+								ret.add(sb.toString());
+							}
+							dirty = false;
+							sb = new StringBuilder();
+							skipspaces = true;
+						}
+						break;
+					case '\'':
+						quote = '\'';
+						skipspaces = false;
+						dirty = true;
+						break;
+					case '"':
+						dirty = true;
+						quote = '"';
+						skipspaces = false;
+						break;
+					default:
+						dirty = true;
+						sb.append(c);
+						skipspaces= false;
+						break;
+				}
+			} else {
+				if (escape) {
+					switch(c) {
+				
+						case 'a':
+							sb.append(Character.toChars(7)[0]);
+							break;
+						case 'b':
+							sb.append('\b');
+							break;
+						case 'f':
+							sb.append('\f');
+							break;
+						case 'n':
+							sb.append('\n');
+							break;
+						case 'r':
+							sb.append('\r');
+							break;
+						case 't':
+							sb.append('\t');
+							break;
+						case 'v':
+							sb.append(Character.toChars(11)[0]);
+							break;
+							// Octal and Hex characters not supported!
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+						case 'x':
+							throw new IllegalArgumentException();
+						default:
+							sb.append(c);
+					}
+					escape = false;
+				} else {
+					if (c == '\\') {
+						escape = true;
+					} else if (c == quote) {
+						quote = null;
+					} else {
+						sb.append(c);
+					}
+				}
+			}
+			ptr++;
+		}
+
+		if (dirty) {
+			ret.add(sb.toString());
+		}
+
+		return ret;
+	}
+
+
+	private static void javaToolOptionsSuck(List<String> args) 
+	{
+		int i;
+		String java_tool_options_suck = System.getenv("JAVA_TOOL_OPTIONS");
+		if (java_tool_options_suck != null && java_tool_options_suck.length() > 0) {
+			List<String> java_tool_options_suck_list = stringToArgs(java_tool_options_suck);
+			int len = java_tool_options_suck_list.size();
+			int arglen = args.size();
+			int suckat = -1;
+			if (arglen >= len) {
+				boolean suck = false;
+				String match = java_tool_options_suck_list.get(0);
+				for(i=0;i<arglen;i++) {
+					if (match.equals(args.get(i))) {
+						suck = true;
+						suckat = i;
+					}
+				}
+				if (suck && ((suckat + len) <= arglen)) {
+					for(i=0;i<len;i++) {
+						args.remove(suckat);
+					}
+				}
+			}
+		}
+	}
+
+	public static String argsToString(List<String> args) {
 		StringBuilder sb = new StringBuilder();
 		Iterator<String> i = args.iterator();
 		while(i.hasNext()) {
@@ -24,14 +158,14 @@ public class PosixSudo implements ISudo {
 		}
 		return sb.toString();
 	}
-	public static void applySudoArgs(List args) 
+
+	public static void applySudoArgs(List<String> args) 
 	{
 		File s;
-		List holdargs = new ArrayList();
+		List<String> holdargs = new ArrayList<String>();
 		holdargs.addAll(args);
 		args.clear();
-		
-		
+
 		// Try gksudo
 		s = new File("/usr/bin/gksudo");
 		if (s.canExecute()) {
@@ -39,7 +173,6 @@ public class PosixSudo implements ISudo {
 			
 			args.add("--description");
 			args.add("Java Application");
-			
 			args.add(argsToString(holdargs));
 			return;
 		}
@@ -51,7 +184,6 @@ public class PosixSudo implements ISudo {
 			args.add("-d");
 			args.add("-c");
 			
-			//args.add("-c");
 			args.add(argsToString(holdargs));
 			
 			args.add("--comment");
@@ -75,7 +207,7 @@ public class PosixSudo implements ISudo {
     	
     	int len = args == null ? 0 : args.length;
     	
-    	ArrayList<String> pargs = new ArrayList(len+2);
+    	ArrayList<String> pargs = new ArrayList<String>(len+2);
     	
     	pargs.add(command);
     	
@@ -85,7 +217,6 @@ public class PosixSudo implements ISudo {
     	
     	applySudoArgs(pargs);
     	
-    	System.out.println(pargs);
     	try {
     		ProcessBuilder builder = new ProcessBuilder(pargs);
     		
@@ -108,7 +239,7 @@ public class PosixSudo implements ISudo {
 			String jarPath = PosixSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
         	String decodedPath = URLDecoder.decode(jarPath, "UTF-8");
         
-        	ArrayList<String> pargs = new ArrayList(args.length + 2);
+        	ArrayList<String> pargs = new ArrayList<String>();
         
         	String jcmd = System.getProperty("sun.java.command");
         	
@@ -134,6 +265,8 @@ public class PosixSudo implements ISudo {
 					pargs.add(iap.next());
 				}
 				
+				javaToolOptionsSuck(pargs);
+				
 				String[] cmd = jcmd.split("\\s+");
 				
 				if (cmd.length > 0 && cmd[0].endsWith(".jar")) {
@@ -144,9 +277,7 @@ public class PosixSudo implements ISudo {
 					pargs.add(cmd[idx]);
 				}
 			}
-			
-			//System.out.println(pargs);
-        	
+
         	String[] sargs = pargs.toArray(new String[pargs.size()]);
         	
         	return executeAsAdministrator(System.getProperty("java.home") + "/bin/java", sargs);
@@ -154,8 +285,7 @@ public class PosixSudo implements ISudo {
         	throw new RuntimeException(ex);
         }
 	}
-	
-	
+
 	public int sudo() 
 	{
 		return sudo(new String[]{});
