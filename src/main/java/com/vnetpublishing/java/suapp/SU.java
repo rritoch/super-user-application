@@ -3,6 +3,7 @@ package com.vnetpublishing.java.suapp;
 public class SU {
 
 	private static boolean daemon = false;
+	public static boolean prefer_stdio = false;
 	
 	public static int run(ISuperUserApplication app, String[] args) 
 	{
@@ -45,4 +46,5 @@ public class SU {
 	public static void setDaemon(boolean b) {
 		daemon = b;
 	}
+	
 }

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import com.vnetpublishing.java.suapp.ISudo;
+import com.vnetpublishing.java.suapp.SU;
 
 public class PosixSudo implements ISudo {
 
@@ -169,6 +170,16 @@ public class PosixSudo implements ISudo {
 		holdargs.addAll(args);
 		args.clear();
 
+		if (SU.prefer_stdio) {
+			// Try sudo
+			s = new File("/usr/bin/sudo");
+			if (s.canExecute()) {
+				args.add("/usr/bin/sudo");
+				args.addAll(holdargs);
+				return;
+			}
+		}
+		
 		// Try gksudo
 		if (have_display) {
 			s = new File("/usr/bin/gksudo");
