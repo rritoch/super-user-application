@@ -16,7 +16,7 @@ Once it is installed you can add it to your projects as a maven dependency.
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2-SNAPSHOT</version>
 </dependency>
 ```
 ### Example Usage:
