@@ -9,7 +9,7 @@ Add the following dependency to your pom.xml
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4</version>
 </dependency>
 ```
 
@@ -28,7 +28,7 @@ Once it is installed you can add it to your projects as a maven dependency.
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
-	<version>0.0.4-SNAPSHOT</version>
+	<version>0.0.5-SNAPSHOT</version>
 </dependency>
 ```
 ### Example Usage:
