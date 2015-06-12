@@ -161,34 +161,38 @@ public class PosixSudo implements ISudo {
 
 	public static void applySudoArgs(List<String> args) 
 	{
+		String display = System.getenv("DISPLAY");
+		boolean have_display = display == null ? false : display.length() > 0;
+		
 		File s;
 		List<String> holdargs = new ArrayList<String>();
 		holdargs.addAll(args);
 		args.clear();
 
 		// Try gksudo
-		s = new File("/usr/bin/gksudo");
-		if (s.canExecute()) {
-			args.add("/usr/bin/gksudo");
-			
-			args.add("--description");
-			args.add("Java Application");
-			args.add(argsToString(holdargs));
-			return;
+		if (have_display) {
+			s = new File("/usr/bin/gksudo");
+			if (s.canExecute()) {
+				args.add("/usr/bin/gksudo");
+				args.add("--description");
+				args.add("Java Application");
+				args.add(argsToString(holdargs));
+				return;
+			}
 		}
 		
 		// Try kdesudo
-		s = new File("/usr/bin/kdesudo");
-		if (s.canExecute()) {
-			args.add("/usr/bin/kdesudo");
-			args.add("-d");
-			args.add("-c");
-			
-			args.add(argsToString(holdargs));
-			
-			args.add("--comment");
-			args.add("Java application needs administrative privileges. Please enter your password");
-			return;
+		if (have_display) {
+			s = new File("/usr/bin/kdesudo");
+			if (s.canExecute()) {
+				args.add("/usr/bin/kdesudo");
+				args.add("-d");
+				args.add("-c");
+				args.add(argsToString(holdargs));
+				args.add("--comment");
+				args.add("Java application needs administrative privileges. Please enter your password");
+				return;
+			}
 		}
 		
 		// Try sudo
