@@ -1,29 +1,37 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>com.vnetpublishing.java</groupId>
-  <artifactId>super-user-application</artifactId>
-  <version>0.0.3</version>
-  <name>Super User Application</name>
-  <description>Create self elevating applications</description>
-  <scm>
-   <url>https://www.github.com/rritoch/super-user-application</url>
-  	<connection>scm:git:git://github.com/rritoch/super-user-application.git</connection>
-  	<developerConnection>scm:git:git@github.com:rritoch/super-user-application.git</developerConnection>
-    <tag>HEAD</tag>
-  </scm>
-  <dependencies>
-  	<dependency>
-		<groupId>net.java.dev.jna</groupId>
-		<artifactId>jna-platform</artifactId>
-		<version>4.1.0</version>
-  	</dependency>
-  	<dependency>
-		<groupId>junit</groupId>
-		<artifactId>junit</artifactId>
-		<version>4.12</version>
-		<scope>test</scope>
-	</dependency>
-  </dependencies>
+	<modelVersion>4.0.0</modelVersion>
+	<groupId>com.vnetpublishing.java</groupId>
+	<artifactId>super-user-application</artifactId>
+	<version>0.0.3</version>
+	<name>Super User Application</name>
+	<description>Create self elevating applications</description>
+	<url>http://www.vnetpublishing.com</url>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
+	<scm>
+		<url>https://www.github.com/rritoch/super-user-application</url>
+		<connection>scm:git:git://github.com/rritoch/super-user-application.git</connection>
+		<developerConnection>scm:git:git@github.com:rritoch/super-user-application.git</developerConnection>
+		<tag>HEAD</tag>
+	</scm>
+	<dependencies>
+		<dependency>
+			<groupId>net.java.dev.jna</groupId>
+			<artifactId>jna-platform</artifactId>
+			<version>4.1.0</version>
+  		</dependency>
+  		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.12</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
   	<build>
 		<directory>target</directory>
 		<outputDirectory>target/classes</outputDirectory>
@@ -79,6 +87,32 @@
 					</execution>
 				</executions>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<version>2.2.1</version>
+				<executions>
+					<execution>
+						<id>attach-sources</id>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.9.1</version>
+				<executions>
+					<execution>
+						<id>attach-javadocs</id>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<distributionManagement>
@@ -91,4 +125,18 @@
     		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
   		</repository>
 	</distributionManagement>
+	<developers>
+		<developer>
+			<id>rritoch</id>
+			<name>Ralph Ritoch</name>
+			<email>rritoch@gmail.com</email>
+			<organization>vnetpublishing.com</organization>
+			<organizationUrl>http://www.vnetpublishing.com</organizationUrl>
+			<roles>
+				<role>Project-Administrator</role>
+				<role>Developer</role>
+			</roles>
+			<timezone>+8</timezone>
+		</developer>
+	</developers>
 </project>
