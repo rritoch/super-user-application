@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.vnetpublishing.java</groupId>
   <artifactId>super-user-application</artifactId>
-  <version>0.0.1</version>
+  <version>0.0.1-SNAPSHOT</version>
   <name>Super User Application</name>
   <description>Create self elevating applications</description>
   
@@ -38,6 +38,17 @@
 			</testResource>
 		</testResources>
 		<plugins>
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<extensions>true</extensions>
+				<inherited>false</inherited>
+				<configuration>
+					<serverId>ossrh-releases</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<!-- <stagingProfileId>42b61fb4c62700</stagingProfileId>  -->
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
