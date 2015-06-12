@@ -2,10 +2,15 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.vnetpublishing.java</groupId>
   <artifactId>super-user-application</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
+  <version>0.0.2-SNAPSHOT</version>
   <name>Super User Application</name>
   <description>Create self elevating applications</description>
-  
+  <scm>
+   <url>https://www.github.com/rritoch/super-user-application</url>
+  	<connection>scm:git:git://github.com/rritoch/super-user-application.git</connection>
+  	<developerConnection>scm:git:git@github.com:rritoch/super-user-application.git</developerConnection>
+    <tag>HEAD</tag>
+  </scm>
   <dependencies>
   	<dependency>
 		<groupId>net.java.dev.jna</groupId>
