@@ -2,7 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>com.vnetpublishing.java</groupId>
   <artifactId>super-user-application</artifactId>
-  <version>0.0.2-SNAPSHOT</version>
+  <version>0.0.3</version>
   <name>Super User Application</name>
   <description>Create self elevating applications</description>
   <scm>
@@ -46,11 +46,13 @@
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.3</version>
 				<extensions>true</extensions>
 				<inherited>false</inherited>
 				<configuration>
-					<serverId>nexus</serverId>
+					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
 					<!-- <stagingProfileId>42b61fb4c62700</stagingProfileId>  -->
 				</configuration>
 			</plugin>
@@ -63,18 +65,30 @@
 					<target>1.7</target>
 				</configuration>
 			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.5</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
 		</plugins>
 	</build>
 	<distributionManagement>
-		<!-- use the following if you're not using a snapshot version. -->
-		<repository>
-    		<id>nexus</id>
-    		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
-		</repository>
-		<!-- use the following if you ARE using a snapshot version. -->
 		<snapshotRepository>
-    		<id>nexus-snapshots</id>
+    		<id>ossrh</id>
     		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
+		</snapshotRepository> 
+		 <repository>
+    		<id>ossrh</id>
+    		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+  		</repository>
 	</distributionManagement>
 </project>

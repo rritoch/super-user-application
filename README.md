@@ -3,6 +3,16 @@ Execute Jar's with Administrator privileges
 
 ## Installation
 
+Add the following dependency to your pom.xml
+
+<dependency>
+	<groupId>com.vnetpublishing.java</groupId>
+	<artifactId>super-user-application</artifactId>
+	<version>0.0.3</version>
+</dependency>
+
+## Building
+
 Checkout this repository and execute the maven installer from the base directory with the pom.xml file in it.
 
 ```
@@ -16,7 +26,7 @@ Once it is installed you can add it to your projects as a maven dependency.
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
-	<version>0.0.2-SNAPSHOT</version>
+	<version>0.0.4-SNAPSHOT</version>
 </dependency>
 ```
 ### Example Usage:
