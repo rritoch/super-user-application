@@ -44,7 +44,7 @@
 				<extensions>true</extensions>
 				<inherited>false</inherited>
 				<configuration>
-					<serverId>ossrh-releases</serverId>
+					<serverId>nexus</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<!-- <stagingProfileId>42b61fb4c62700</stagingProfileId>  -->
 				</configuration>
@@ -60,4 +60,16 @@
 			</plugin>
 		</plugins>
 	</build>
+	<distributionManagement>
+		<!-- use the following if you're not using a snapshot version. -->
+		<repository>
+    		<id>nexus</id>
+    		<url>https://oss.sonatype.org/service/local/staging/deploy/maven2</url>
+		</repository>
+		<!-- use the following if you ARE using a snapshot version. -->
+		<snapshotRepository>
+    		<id>nexus-snapshots</id>
+    		<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+	</distributionManagement>
 </project>
