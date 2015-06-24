@@ -154,8 +154,11 @@ public class WinSudo implements ISudo
 			System.err.println("WARNING: Error in SetInformationJobObject: " + lastError + ": " + errorMessage);
 		}
 		
-		execInfo.nShow = Shell32X.SW_SHOWDEFAULT;
-		//execInfo.nShow = Shell32X.SW_HIDE;
+		if (SU.debug) {
+			execInfo.nShow = Shell32X.SW_SHOWDEFAULT;
+		} else {
+			execInfo.nShow = Shell32X.SW_HIDE;
+		}
 		
 		execInfo.fMask = Shell32X.SEE_MASK_NOCLOSEPROCESS;
 		execInfo.lpVerb = "runas";
