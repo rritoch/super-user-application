@@ -1,6 +1,10 @@
 # super-user-application
 Execute Jar's with Administrator privileges
 
+*Note:* On some versions of windows, elevated applications don't always have access to 
+removable drives that were mounted by users. Applications that need to be elevated on windows
+should be run from a non-removable hard drive. 
+
 ## Installation
 
 Add the following dependency to your pom.xml
@@ -9,7 +13,7 @@ Add the following dependency to your pom.xml
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
-	<version>0.0.4</version>
+	<version>0.0.5</version>
 </dependency>
 ```
 
@@ -28,7 +32,7 @@ Once it is installed you can add it to your projects as a maven dependency.
 <dependency>
 	<groupId>com.vnetpublishing.java</groupId>
 	<artifactId>super-user-application</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.6-SNAPSHOT</version>
 </dependency>
 ```
 ### Example Usage:
