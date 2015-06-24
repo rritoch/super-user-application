@@ -1,23 +1,29 @@
 package com.vnetpublishing.java.suapp.win;
 
+import java.io.File;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.lang.management.ManagementFactory;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import com.sun.jna.WString;
+import com.sun.jna.*;
 import com.sun.jna.platform.win32.Kernel32;
 import com.sun.jna.platform.win32.Kernel32Util;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
+import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.ptr.IntByReference;
 import com.vnetpublishing.java.suapp.ISudo;
+import com.vnetpublishing.java.suapp.SU;
 import com.vnetpublishing.java.suapp.win.Kernel32X.JOBOBJECT_EXTENDED_LIMIT_INFORMATION;
 import com.vnetpublishing.java.suapp.win.Shell32X.SHELLEXECUTEINFO;
 
 public class WinSudo implements ISudo 
 {
+	
 	
 	public static String escapeParam(String param) 
 	{
@@ -45,14 +51,73 @@ public class WinSudo implements ISudo
 		return sb.toString();
 	}
 	
+	
+	  public static String getMSDOSName(String fileName)
+			throws IOException, InterruptedException 
+	  {
+
+		String path = getAbsolutePath(fileName);	
+		Process process = Runtime.getRuntime().exec("cmd /c for %I in (\"" + path + "\") do @echo %~fsI");
+		process.waitFor();
+		byte[] data = new byte[65536];
+		int size = process.getInputStream().read(data);
+
+		if (size <= 0) {
+			return null;
+		}
+
+		return new String(data, 0, size).replaceAll("\\r\\n", "");
+	}
+
+	public static String getAbsolutePath(String fileName)
+	    throws IOException {
+		File file = new File(fileName);
+		String path = file.getAbsolutePath();
+
+		if (file.exists() == false) {
+			file = new File(path);
+		}
+
+		path = file.getCanonicalPath();
+
+		if (file.isDirectory() && (path.endsWith(File.separator) == false)) {
+		        path += File.separator;
+		}
+		return path;
+	}
+	
+	
 	public static int executeAsAdministrator(String command, String args)
 	{
+		if (SU.debug) {
+			System.err.println(String.format("executeAsAdministrator(%s,%s)",String.valueOf(command),String.valueOf(args)));
+		}
+		
 		int lastError = 0;
 		String errorMessage = "";
 		Shell32X.SHELLEXECUTEINFO execInfo = new Shell32X.SHELLEXECUTEINFO();
-		execInfo.lpFile = new WString(command);
+		
+		execInfo.lpFile = command;
 		if (args != null)
-			execInfo.lpParameters = new WString(args);
+			execInfo.lpParameters = args;
+		
+		
+		String os = System.getProperty("os.name");
+		
+		
+		if ("Windows Vista".equals(os) || "Windows 7".equals(os)) {
+			try {
+				String lpDirectory = getMSDOSName(System.getProperty("user.dir"));
+				if (SU.debug) {
+					System.err.println(String.format("using lpDirectory = '%s'",lpDirectory));					
+				}
+				execInfo.lpDirectory = lpDirectory;
+			} catch (IOException e) {
+				throw new IllegalStateException("Unable to get current path name",e);
+			} catch (InterruptedException e) {
+				throw new IllegalStateException("Unable to get current path name",e);
+			}
+		}
 		
 		// Setup Job
 		
@@ -89,11 +154,11 @@ public class WinSudo implements ISudo
 			System.err.println("WARNING: Error in SetInformationJobObject: " + lastError + ": " + errorMessage);
 		}
 		
-		//execInfo.nShow = Shell32X.SW_SHOWDEFAULT;
-		execInfo.nShow = Shell32X.SW_HIDE;
+		execInfo.nShow = Shell32X.SW_SHOWDEFAULT;
+		//execInfo.nShow = Shell32X.SW_HIDE;
 		
 		execInfo.fMask = Shell32X.SEE_MASK_NOCLOSEPROCESS;
-		execInfo.lpVerb = new WString("runas");
+		execInfo.lpVerb = "runas";
 		boolean result = Shell32X.INSTANCE.ShellExecuteEx(execInfo);
 
 		if (!result)
@@ -139,16 +204,35 @@ public class WinSudo implements ISudo
 	
 	public int sudo(String[] args) {
 		try {
+			System.err.println("WARNING: Elevating an application with administrator privileges from a network or removable drive may fail.");
 			String jarPath = WinSudo.class.getProtectionDomain().getCodeSource().getLocation().getPath();
 			String decodedPath = URLDecoder.decode(jarPath, "UTF-8");
 			
 			decodedPath = decodedPath.substring(1, decodedPath.length());
 		
-			ArrayList<String> pargs = new ArrayList<String>(args.length + 2);
-		
+			String os = System.getProperty("os.name");
+			
+			if (SU.debug) {
+				System.err.println(String.format("os.name = '%s'",os));
+				System.err.println(String.format("user.dir = '%s'",System.getProperty("user.dir")));
+			}
+			
+			String cPath;
+			File cmdF = new File(System.getProperty("java.home") + "\\bin\\java");
+			try {
+				cPath = cmdF.getCanonicalPath();
+			} catch (IOException e) {
+				throw new IllegalStateException("Unable to get java path name",e);
+			}
+			
+			ArrayList<String> pargs = new ArrayList<String>();
+
 			String jcmd = System.getProperty("sun.java.command");
 			
 			if (jcmd == null || jcmd.length() < 1) {
+				if (SU.debug) {
+					System.err.println("WARNING: Missing sun.java.command");
+				}
 				if (decodedPath.endsWith(".jar")) {
 					pargs.add("-jar");
 					pargs.add(decodedPath);
@@ -170,6 +254,10 @@ public class WinSudo implements ISudo
 				}
 				
 
+				if (SU.debug) {
+					System.err.print("DEBUG: inputArguments: ");
+					System.err.println(pargs);
+				}
 				
 				String[] cmd = jcmd.split("\\s+");
 				
@@ -182,12 +270,40 @@ public class WinSudo implements ISudo
 				}
 			}
 			
-			
-			//System.out.println("pargs");
+			if (SU.debug) {
+				System.err.println(pargs);
+			}
 			
 			String strparams = toParams(pargs.toArray(new String[pargs.size()]));
 			
-			return executeAsAdministrator(System.getProperty("java.home") + "\\bin\\java", strparams);
+			
+			if ("Windows Vista".equals(os) || "Windows 7".equals(os)) {
+				if (SU.debug) {
+					System.err.println("DEBUG: Windows 7 or vista, using cmd shell");
+				}
+				try {
+					
+					strparams = String.format(
+						"/C \"cd /D %s && %s %s\"",
+						getMSDOSName(System.getProperty("user.dir")),
+						getMSDOSName(cPath),
+						strparams.replace("\\", "\\\\").replace("\"", "\\\"")
+					);
+					cPath = "cmd";
+					
+				} catch (IOException e) {
+					throw new IllegalStateException("Unable to get java path name",e);
+				} catch (InterruptedException e) {
+					throw new IllegalStateException("Unable to get java path name",e);
+				}
+			} else {
+				if (SU.debug) {
+					System.err.println("DEBUG: Not Windows 7 or Vista");
+				}
+			}
+			
+			return executeAsAdministrator(cPath, strparams);
+
 		} catch (UnsupportedEncodingException ex) {
 			throw new RuntimeException(ex);
 		}

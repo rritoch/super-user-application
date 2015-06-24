@@ -18,6 +18,7 @@ import com.sun.jna.platform.win32.WinDef.WORD;
 import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinNT.LARGE_INTEGER;
 import com.sun.jna.platform.win32.WinReg.HKEY;
+import com.sun.jna.ptr.ByteByReference;
 import com.sun.jna.win32.W32APIOptions;
 
 public interface Shell32X extends Shell32
@@ -218,14 +219,14 @@ typedef struct _STARTUPINFO {
         public int cbSize = size();
         public int fMask;
         public HWND hwnd;
-        public WString lpVerb;
-        public WString lpFile;
-        public WString lpParameters;
-        public WString lpDirectory;
+        public String lpVerb;
+        public String lpFile;
+        public String lpParameters;
+        public String lpDirectory;
         public int nShow;
         public HINSTANCE hInstApp;
         public Pointer lpIDList;
-        public WString lpClass;
+        public String lpClass;
         public HKEY hKeyClass;
         public int dwHotKey;
 

@@ -4,6 +4,7 @@ public class SU {
 
 	private static boolean daemon = false;
 	public static boolean prefer_stdio = false;
+	public static boolean debug = false;
 	
 	public static int run(ISuperUserApplication app, String[] args) 
 	{
